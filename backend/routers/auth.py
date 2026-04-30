@@ -208,7 +208,7 @@ async def admin_reset_password(data: ResetPassword):
 
 
 @router.get("/admin/details")
-async def get_admin_details(email: EmailStr):
+async def get_admin_details(email: EmailStr, admin: Admin = Depends(get_current_admin)):
 
     admin = await Admin.find_one(Admin.email == email)
 

@@ -224,6 +224,7 @@ export default function LoginSuccess() {
   const handleLogout = () => {
     localStorage.removeItem("admin_token");
     localStorage.removeItem("admin_email");
+    localStorage.removeItem("isAuth")
     navigate("/login");
   };
 

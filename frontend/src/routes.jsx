@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 import Login from "./components/auths/Login";
 import AdminRegister from "./components/auths/AdminRegister";
@@ -10,22 +10,48 @@ import LoginSuccess from "./components/auth/loginsuccess";
 import HowItWorks from "./components/auth/HowItWorks";
 import Creators from "./components/auth/Creators";
 
+import ProtectedRoute from "./proctedroute"; // 👈 add this
+
 export default function AppRoutes() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/login" element={<Login />} />
+    <Routes>
+      <Route path="/" element={<Login />} />
+      <Route path="/login" element={<Login />} />
 
-        <Route path="/admin/register" element={<AdminRegister />} />
-        <Route path="/admin/forgot-password" element={<AdminForgotPassword />} />
-        <Route path="/admin/verify-otp" element={<AdminOtpVerification />} />
-        <Route path="/admin/reset-password" element={<AdminResetPassword />} />
-        <Route path="/login-success" element={<LoginSuccess />} />
-        <Route path="/how-it-works" element={<HowItWorks />} />
-        <Route path="/creators" element={<Creators />} />
-        <Route path="*" element={<Login />} />
-      </Routes>
-    </BrowserRouter>
+      <Route path="/admin/register" element={<AdminRegister />} />
+      <Route path="/admin/forgot-password" element={<AdminForgotPassword />} />
+      <Route path="/admin/verify-otp" element={<AdminOtpVerification />} />
+      <Route path="/admin/reset-password" element={<AdminResetPassword />} />
+
+      {/* 🔐 PROTECTED ROUTES */}
+      <Route
+        path="/login-success"
+        element={
+          <ProtectedRoute>
+            <LoginSuccess />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/how-it-works"
+        element={
+          <ProtectedRoute>
+            <HowItWorks />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/creators"
+        element={
+          <ProtectedRoute>
+            <Creators />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route path="*" element={<Login />} />
+    </Routes>
   );
 }

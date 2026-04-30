@@ -11,6 +11,7 @@ from datetime import datetime
 
 import librosa
 import numpy as np
+import requests
 import torch
 import whisper
 from huggingface_hub import InferenceClient
@@ -25,7 +26,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 HF_API_KEY = os.getenv("HF_API_KEY") or os.getenv("HF_TOKEN")
-
+NV_API_KEY = os.getenv("NV_API_KEY")
+NV_B_API_KEY = os.getenv("NV_B_API_KEY")  # Optional secondary key for load balancing or fallback
 
 # Initialize Hugging Face Inference Client
 hf_client = InferenceClient(provider="hf-inference", api_key=HF_API_KEY)
@@ -37,6 +39,27 @@ THEMES = {
     "cyberpunk": "cyberpunk, neon lights",
     "pixel": "pixel art, 8-bit",
 }
+# -------- NVIDIA IMAGE GENERATION --------
+def generate_image_nv(prompt, width=1024, height=1024, steps=4, seed=0):
+    url = "https://ai.api.nvidia.com/v1/genai/black-forest-labs/flux.2-klein-4b"
+
+    headers = {
+        "Authorization": f"Bearer {NV_API_KEY}",
+        "Accept": "application/json",
+    }
+
+    payload = {
+        "prompt": prompt,
+        "width": width,
+        "height": height,
+        "seed": seed,
+        "steps": steps
+    }
+
+    response = requests.post(url, headers=headers, json=payload)
+    response.raise_for_status()
+
+    return response.json()
 
 # -------- LOAD MODELS ONCE --------
 emotion_model = Wav2Vec2ForSequenceClassification.from_pretrained(
@@ -248,7 +271,7 @@ async def analyze_audio(file, theme: str, mode: str, safe_mode: bool = False):
             text = "A peaceful scene"
 
         # -------- IMAGE --------
-        image_url = None
+        '''image_url = None
         image_error = None
         if safe_mode:
             image_url = get_safe_image_url_for_emotion(emotion)
@@ -288,7 +311,84 @@ async def analyze_audio(file, theme: str, mode: str, safe_mode: bool = False):
                 image.save(filepath)
                 image_url = f"/generated_images/{filename}"
             except Exception as e:
-                image_error = str(e)
+                image_error = str(e)'''
+        image_url = None
+        image_error = None
+
+        if safe_mode:
+            image_url = get_safe_image_url_for_emotion(emotion)
+            if not image_url:
+                image_error = f"No safe image found for emotion: {emotion}"
+
+        else:
+            theme_prompt = THEMES.get(theme, THEMES["animated"])
+            prompt = f"{text}, {emotion} mood, {theme_prompt}, high quality, masterpiece"
+
+            filename = (
+                f"result_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}_"
+                f"{uuid.uuid4().hex[:8]}.png"
+            )
+            filepath = BASE_DIR / "generated_images" / filename
+
+           # ---------------- HUGGING FACE FIRST ----------------
+        try:
+            if not HF_API_KEY:
+                raise RuntimeError("HF_API_KEY is not configured")
+
+            seed = int(time.time_ns() % (2**31 - 1))
+
+            try:
+                image = hf_client.text_to_image(
+                    prompt,
+                    model="black-forest-labs/FLUX.1-schnell",
+                    seed=seed,
+                )
+            except TypeError:
+                image = hf_client.text_to_image(
+                    prompt,
+                    model="black-forest-labs/FLUX.1-schnell",
+                )
+
+            image.save(filepath)
+            image_url = f"/generated_images/{filename}"
+
+        # ---------------- FALLBACK TO NVIDIA ----------------
+        except Exception as hf_error:
+            print("⚠️ HF failed, switching to NVIDIA:", hf_error)
+
+            try:
+                if not NV_API_KEY:   # ✅ FIXED KEY NAME
+                    raise RuntimeError("NV_API_KEY is not configured")
+
+                result = generate_image_nv(
+                    prompt=prompt,
+                    width=1024,
+                    height=1024,
+                    steps=4,
+                    seed=int(time.time_ns() % (2**31 - 1))
+                )
+
+                # Handle multiple response formats
+                image_data = None
+                if "image" in result:
+                    image_data = result["image"]
+                elif "data" in result:
+                    image_data = result["data"]
+                elif "artifacts" in result:
+                    image_data = result["artifacts"][0]["base64"]
+
+                if not image_data:
+                    raise RuntimeError(f"Invalid NVIDIA response: {result}")
+
+                import base64
+                with open(filepath, "wb") as f:
+                    f.write(base64.b64decode(image_data))
+
+                image_url = f"/generated_images/{filename}"
+
+            except Exception as nv_error:
+                image_error = f"Both HF & NVIDIA failed: {nv_error}"
+                            
 
         return {
             "emotion": emotion,

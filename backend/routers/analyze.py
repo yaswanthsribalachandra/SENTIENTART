@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File, Form
+from fastapi import APIRouter, UploadFile, File, Form,Depends
 from fastapi.responses import JSONResponse
 import traceback
 from services.ai_pipeline import analyze_audio
