@@ -265,7 +265,7 @@ async def analyze_audio(file, theme: str, mode: str, safe_mode: bool = False):
                 try:
                     image = hf_client.text_to_image(
                         prompt,
-                        # model="stabilityai/stable-diffusion-xl-base-1.0",
+                        #model="stabilityai/stable-diffusion-xl-base-1.0",
                         model="black-forest-labs/FLUX.1-schnell",
                         # model="black-forest-labs/FLUX.2-klein",
                         # model="m-a-p/Z-Image-Turbo",

@@ -9,35 +9,70 @@ export default function HowItWorks() {
           <Link to="/login-success" className="hiw-back-link">
             Back to Dashboard
           </Link>
+
           <h1>The Intelligence Behind the Art</h1>
+
           <p className="hiw-intro">
-            Our pipeline uses a multi-modal AI approach to turn vocal vibrations into
-            visual masterpieces.
+            This platform transforms human voice into expressive digital art using a 
+            multi-stage AI pipeline. By combining signal processing, emotion AI, and 
+            generative models, we convert speech into visually meaningful creations 
+            that reflect both content and emotion.
           </p>
 
+          {/* STEP 1 */}
           <div className="hiw-step">
-            <h3>1. Signal Acquisition</h3>
+            <h3>1. Voice Signal Processing</h3>
             <p>
-              Your voice is captured and converted into a WAV format. We analyze
-              frequency, pitch, and tempo - the prosody of your speech - to detect
-              emotional markers beyond just the words spoken.
+              The process begins with capturing your voice input and converting it 
+              into a high-quality WAV format. Advanced audio signal processing techniques 
+              extract key features such as pitch, tone, frequency, tempo, and energy levels.
+              These features help us understand not just what you say, but how you say it.
+            </p>
+            <p>
+              This stage ensures that emotional nuances like excitement, calmness, or stress 
+              are preserved and quantified for further analysis.
             </p>
           </div>
 
+          {/* STEP 2 */}
           <div className="hiw-step">
-            <h3>2. Emotional Inference</h3>
+            <h3>2. Emotion & Context Understanding</h3>
             <p>
-              Using a fine-tuned transformer model, the system categorizes audio into
-              primary emotions and assigns a confidence score to each.
+              The extracted audio features are passed into a fine-tuned deep learning model 
+              based on transformer architecture. This model analyzes both the vocal patterns 
+              and speech content to classify emotions such as happiness, sadness, anger, or neutrality.
+            </p>
+            <p>
+              Each prediction is accompanied by confidence scores, enabling the system to 
+              intelligently balance multiple emotional signals when generating the final output.
             </p>
           </div>
 
+          {/* STEP 3 */}
           <div className="hiw-step">
-            <h3>3. Latent Diffusion Generation</h3>
+            <h3>3. AI-Powered Image Generation</h3>
             <p>
-              The detected emotion and transcription are fed into an image generation
-              engine. It applies your chosen art style as a global prompt modifier to
-              create the final visual output.
+              The detected emotion, combined with the transcribed text, is converted into 
+              a structured prompt. This prompt is fed into a latent diffusion model, which 
+              generates high-quality images from noise through iterative refinement.
+            </p>
+            <p>
+              The selected art style acts as a guiding parameter, ensuring the final image 
+              aligns with your aesthetic preference while still representing your emotional state.
+            </p>
+          </div>
+
+          {/* STEP 4 */}
+          <div className="hiw-step">
+            <h3>4. Personalized Artistic Output</h3>
+            <p>
+              The final result is a unique piece of AI-generated artwork that reflects your 
+              voice, emotion, and intent. Each output is different, making every interaction 
+              a personalized creative experience.
+            </p>
+            <p>
+              This approach bridges the gap between human expression and machine creativity, 
+              turning speech into a new form of digital storytelling.
             </p>
           </div>
         </div>

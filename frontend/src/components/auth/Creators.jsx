@@ -1,13 +1,34 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Creators() {
   const [showSecret, setShowSecret] = useState(false);
   const [safeMode, setSafeMode] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem("token");
+
+      // 🚨 Redirect if not authenticated
+      if (!token) {
+        navigate("/login");
+      }
+    };
+
+    // ✅ Run on first load
+    checkAuth();
+
+    // ✅ Restore safe mode
     setSafeMode(localStorage.getItem("safe_mode") === "true");
-  }, []);
+
+    // 🔥 Fix for browser back/forward navigation issue
+    window.addEventListener("popstate", checkAuth);
+
+    return () => {
+      window.removeEventListener("popstate", checkAuth);
+    };
+  }, [navigate]);
 
   const toggleSafeMode = () => {
     const next = !safeMode;
@@ -22,36 +43,71 @@ export default function Creators() {
           Back
         </Link>
 
-        <button className="cr-secret-btn" onClick={() => setShowSecret(true)} aria-label="Secret Settings" />
+        <button
+          className="cr-secret-btn"
+          onClick={() => setShowSecret(true)}
+          aria-label="Secret Settings"
+        />
 
         <div className="cr-profile-card">
-          <div className="cr-avatar">A</div>
-          <h1>Your Name</h1>
+          <div className="cr-avatar"></div>
+          <h1>Dasari Yaswanth Sri Balachandra</h1>
           <span className="cr-role">Lead Developer and AI Architect</span>
           <p>
-            A 21-year-old developer passionate about Python, full-stack web development,
-            and the intersection of human emotion and artificial intelligence.
+            Focused on developing intelligent and scalable solutions using Machine Learning,
+            Natural Language Processing, Generative AI, and Agentic AI, combined with strong
+            full-stack development skills.
           </p>
 
           <div className="cr-socials">
-            <a href="https://github.com/yaswanthsribalachandra" aria-label="GitHub">GitHub</a>
-            <a href="https://www.linkedin.com/in/dasari-yaswanth-sri-balachandra/" aria-label="LinkedIn">LinkedIn</a>
-            <a href="https://superlative-kheer-159b04.netlify.app" aria-label="Website">Website</a>
+            <a
+              href="https://github.com/yaswanthsribalachandra"
+              aria-label="GitHub"
+            >
+              GitHub
+            </a>
+            <a
+              href="https://www.linkedin.com/in/dasari-yaswanth-sri-balachandra/"
+              aria-label="LinkedIn"
+            >
+              LinkedIn
+            </a>
+            <a
+              href="https://superlative-kheer-159b04.netlify.app"
+              aria-label="Website"
+            >
+              Website
+            </a>
           </div>
         </div>
 
         {showSecret && (
-          <div className="cr-modal-overlay" onClick={() => setShowSecret(false)}>
-            <div className="cr-modal" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="cr-modal-overlay"
+            onClick={() => setShowSecret(false)}
+          >
+            <div
+              className="cr-modal"
+              onClick={(e) => e.stopPropagation()}
+            >
               <h3>Secret Mode</h3>
-              <p>Use local safe emotion images instead of Hugging Face generation.</p>
+              <p>
+                Use local safe emotion images instead of Hugging Face generation.
+              </p>
+
               <button
                 className={`cr-toggle ${safeMode ? "on" : "off"}`}
                 onClick={toggleSafeMode}
               >
                 {safeMode ? "ON" : "OFF"}
               </button>
-              <button className="cr-close" onClick={() => setShowSecret(false)}>Close</button>
+
+              <button
+                className="cr-close"
+                onClick={() => setShowSecret(false)}
+              >
+                Close
+              </button>
             </div>
           </div>
         )}
@@ -132,8 +188,13 @@ export default function Creators() {
           margin-bottom: 10px;
         }
 
-        .cr-toggle.on { background: linear-gradient(45deg, #2bb673, #1f9d63); }
-        .cr-toggle.off { background: linear-gradient(45deg, #7c4dff, #5f39d8); }
+        .cr-toggle.on {
+          background: linear-gradient(45deg, #2bb673, #1f9d63);
+        }
+
+        .cr-toggle.off {
+          background: linear-gradient(45deg, #7c4dff, #5f39d8);
+        }
 
         .cr-close {
           width: 100%;
@@ -171,10 +232,18 @@ export default function Creators() {
           font-weight: 700;
         }
 
-        .cr-profile-card h1 {
-          font-family: Poppins, Arial, sans-serif;
-          margin: 10px 0;
-          font-size: 1.8rem;
+        .cr-image-wrapper {
+          width: 100%;
+          height: 280px;
+          border-radius: 16px;
+          overflow: hidden;
+          margin-bottom: 20px;
+        }
+
+        .cr-image-wrapper img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
         }
 
         .cr-role {

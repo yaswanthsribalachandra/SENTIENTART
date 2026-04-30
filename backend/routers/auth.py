@@ -3,7 +3,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt, JWTError
 from datetime import datetime, timedelta, timezone
 from pydantic import BaseModel, EmailStr, Field, root_validator
-from models import Admin
+from models import Admin,AdminLogin,ForgotPassword,VerifyOTP, ResetPassword
 import random, smtplib
 from email.message import EmailMessage
 import os
@@ -43,7 +43,7 @@ class AdminRegister(BaseModel):
     last_name: str
     profession: str
     email: EmailStr
-    password: str = Field(min_length=4)
+    password: str
     confirm_password: str
 
     @root_validator
@@ -51,25 +51,6 @@ class AdminRegister(BaseModel):
         if values.get("password") != values.get("confirm_password"):
             raise ValueError("Passwords do not match")
         return values
-
-
-class AdminLogin(BaseModel):
-    email: EmailStr
-    password: str
-
-
-class ForgotPassword(BaseModel):
-    email: EmailStr
-
-
-class VerifyOTP(BaseModel):
-    email: EmailStr
-    otp: str = Field(min_length=6, max_length=6)
-
-
-class ResetPassword(BaseModel):
-    email: EmailStr
-    new_password: str = Field(min_length=4)
 
 
 # ---------------- AUTH ----------------
