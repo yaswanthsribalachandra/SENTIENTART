@@ -29,14 +29,14 @@ export default function Creators() {
           <h1>Your Name</h1>
           <span className="cr-role">Lead Developer and AI Architect</span>
           <p>
-            A 22-year-old developer passionate about Python, full-stack web development,
+            A 21-year-old developer passionate about Python, full-stack web development,
             and the intersection of human emotion and artificial intelligence.
           </p>
 
           <div className="cr-socials">
-            <a href="#" aria-label="GitHub">GitHub</a>
-            <a href="#" aria-label="LinkedIn">LinkedIn</a>
-            <a href="#" aria-label="Website">Website</a>
+            <a href="https://github.com/yaswanthsribalachandra" aria-label="GitHub">GitHub</a>
+            <a href="https://www.linkedin.com/in/dasari-yaswanth-sri-balachandra/" aria-label="LinkedIn">LinkedIn</a>
+            <a href="https://superlative-kheer-159b04.netlify.app" aria-label="Website">Website</a>
           </div>
         </div>
 

@@ -8,6 +8,7 @@ import random, smtplib
 from email.message import EmailMessage
 import os
 from dotenv import load_dotenv
+from passlib.context import CryptContext
 
 load_dotenv()
 
@@ -21,6 +22,18 @@ EMAIL_PASS = os.getenv("EMAIL_PASS")
 
 security = HTTPBearer()
 
+
+
+#----------------- Functions ----------------
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def hash_password(password: str) -> str:
+    '''Hash a password for storing.'''
+    return pwd_context.hash(password)
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    '''Verify a stored password against one provided by user.'''
+    return pwd_context.verify(plain_password, hashed_password)
 
 
 # ---------------- SCHEMAS ----------------
@@ -113,7 +126,7 @@ async def register(data: AdminRegister):
         last_name=data.last_name,
         profession=data.profession,
         email=data.email,
-        password=data.password
+        password=hash_password(data.password)
     )
 
     await admin.insert()
@@ -126,7 +139,7 @@ async def login(data: AdminLogin):
 
     admin = await Admin.find_one(Admin.email == data.email)
 
-    if not admin or admin.password != data.password:
+    if not admin or not verify_password(data.password, admin.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     token = create_token({"admin_id": str(admin.id), "role": "admin"})
@@ -194,7 +207,7 @@ async def admin_reset_password(data: ResetPassword):
     if not admin:
         raise HTTPException(status_code=404, detail="Admin not found")
 
-    admin.password = data.new_password
+    admin.password = hash_password(data.new_password)
     await admin.save()
 
     return {"message": "Password reset successful"}
@@ -209,3 +222,4 @@ async def get_admin_details(email: EmailStr):
         raise HTTPException(status_code=404, detail="Admin not found")
 
     return admin
+
